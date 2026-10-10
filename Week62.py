@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 from mock_llm import mock_llm_call   # 1차시에 만든 모듈 재사용
 
 SYSTEM = """당신은 고객 리뷰 분류기입니다.
@@ -42,12 +43,9 @@ def classify_review(review_text):
     return data
 
 # 비즈니스 로직에 바인딩: 리뷰 목록 자동 분류 및 집계
-reviews = [
-    "배송이 하루 만에 왔어요 최고",
-    "품질이 사진과 너무 달라요",
-    "환불 처리가 왜 이렇게 느린가요",
-    "상담 직원이 친절하였어요",
-]
+# 입력 데이터: 첨부된 고객 리뷰 데이터 세트(reviews_labeled.csv) 로드
+df = pd.read_csv("reviews_labeled.csv", encoding="utf-8-sig")
+reviews = df["review"].tolist()   # review 열을 리스트로 변환하여 파이프라인 입력으로 사용
 # ===== 비즈니스 로직 바인딩: 리뷰 자동 분류 및 집계 =====
 # 과제 2: 불량 응답을 만나도 파이프라인이 중단되지 않고, 실패 건수를 집계하여 출력
 
