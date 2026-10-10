@@ -10,12 +10,24 @@ SYSTEM = """당신은 고객 리뷰 분류기입니다.
 def classify_review(review_text):
     """리뷰 1건을 분류하여 딕셔너리로 반환. 실패 시 None."""
     result = mock_llm_call(SYSTEM, f"리뷰: {review_text}")
-    raw = result["text"].strip() # 결과 텍스트의 앞뒤 불필요한 공백과 줄바꿈을 제거
+
+    # 방어 0 (과제 2 보강): stop_reason 확인 — max_tokens 도달로 잘린 응답은 파싱 전에 실패 처리
+    if result["stop_reason"] == "max_tokens":
+        print(f"[경고] 응답 잘림(max_tokens): {result['text'][:50]}...")
+        return None
+
+    raw = result["text"].strip()  # 결과 텍스트의 앞뒤 불필요한 공백과 줄바꿈을 제거
 
     # 방어 1: 마크다운 코드 블록 제거 (포맷 정규화): ```json ... ``` 코드 제거
     if raw.startswith("```"):
         raw = raw.strip("`")  # 문자열의 시작과 끝에 붙은 백틱(`)만 모두 제거
-        raw = raw.replace("json", "", 1).strip() # "json"을 한번만(1회) 지우고 strip()
+        raw = raw.replace("json", "", 1).strip()  # "json"을 한번만(1회) 지우고 strip()
+
+    # 방어 1-2 (과제 2 보강): 사족 제거 — 첫 '{'부터 마지막 '}'까지만 JSON으로 추출
+    start = raw.find("{")
+    end = raw.rfind("}")
+    if start != -1 and end != -1:
+        raw = raw[start:end + 1]
 
     # 방어 2: 파싱 실패는 언제든 일어날 수 있다 → 예외 처리 필수
     try:
