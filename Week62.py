@@ -10,6 +10,11 @@ SYSTEM = """당신은 고객 리뷰 분류기입니다.
 
 def classify_review(review_text):
     """리뷰 1건을 분류하여 딕셔너리로 반환. 실패 시 None."""
+    # 입력 검증 (S9): 빈 문자열 또는 문자열이 아닌 입력은 LLM 호출 없이 실패 처리
+    if not isinstance(review_text, str) or not review_text.strip():
+        print("[경고] 유효하지 않은 입력: 빈 리뷰 또는 문자열 아님")
+        return None
+    
     result = mock_llm_call(SYSTEM, f"리뷰: {review_text}")
 
     # 방어 0 (과제 2 보강): stop_reason 확인 — max_tokens 도달로 잘린 응답은 파싱 전에 실패 처리
