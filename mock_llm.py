@@ -1,6 +1,9 @@
 # mock_llm.py — 6~12주차용 모의 LLM 모듈
 import random
 
+# 불량 응답 유형별 발생 건수 집계 (과제 2: 복구 건수 보고용)
+bad_stats = {"코드펜스": 0, "사족": 0, "잘림": 0}
+
 def mock_llm_call(system, user_message, temperature=0.2, max_tokens=500):
     """실제 API와 동일한 인터페이스를 갖는 모의 함수.
     13주차에 이 함수의 내부만 실제 Anthropic 호출로 교체한다."""
@@ -31,6 +34,8 @@ def mock_llm_call(system, user_message, temperature=0.2, max_tokens=500):
     # 20% 확률로 불량 응답 유형 3가지 중 1개를 무작위 선택
     if random.random() < 0.2:
         bad_type = random.choice(["코드펜스", "사족", "잘림"])
+        bad_stats[bad_type] += 1   # 해당 유형의 발생 건수 1 증가
+
 
         if bad_type == "코드펜스":
             # 불량 유형 1: 마크다운 코드펜스(```json ... ```)로 감싼 응답

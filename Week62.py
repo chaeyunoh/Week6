@@ -1,6 +1,6 @@
 import json
 import pandas as pd
-from mock_llm import mock_llm_call   # 1차시에 만든 모듈 재사용
+from mock_llm import mock_llm_call, bad_stats  # 1차시에 만든 모듈 재사용
 
 SYSTEM = """당신은 고객 리뷰 분류기입니다.
 반드시 아래 JSON 형식으로만 응답하세요. 다른 텍스트를 절대 포함하지 마세요.
@@ -71,3 +71,8 @@ for r in reviews:
 # 파이프라인 종료 후 최종 집계 출력
 print(stats)
 print(f"처리 {ok_count}건 / 실패 {fail_count}건 (전체 {len(reviews)}건)")
+# 불량 응답 유형별 발생 건수 및 복구 현황
+bad_total = sum(bad_stats.values())
+recovered = bad_total - fail_count
+print(f"불량 응답 {bad_total}건 {bad_stats}")
+print(f"복구 {recovered}건 / 실패 {fail_count}건")
